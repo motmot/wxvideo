@@ -22,6 +22,7 @@ class DynamicImageCanvas(wx.Window):
         self.do_draw_points = True
         self.mirror_display = False
         self.display_rotate_180 = False
+        self.lbrt = {}
         
     def set_clipping(self,val):
         print 'ignoring set_clipping command in wxvideo: clipping not implemented'
@@ -76,6 +77,13 @@ class DynamicImageCanvas(wx.Window):
             for lineseg in linesegs:
                 drawDC.DrawLine(*lineseg)
 
+        if id_val in self.lbrt:
+            l,b,r,t = self.lbrt[id_val]
+            drawDC.DrawLine(l,b, r,b)
+            drawDC.DrawLine(r,b, r,t)
+            drawDC.DrawLine(r,t, l,t)
+            drawDC.DrawLine(l,t, l,b)
+
         if self.mirror_display:
             img = wx.ImageFromBitmap(bmp)
             img = img.Mirror(True)
@@ -90,6 +98,9 @@ class DynamicImageCanvas(wx.Window):
             bmp = wx.BitmapFromImage(img)
         
         self.bitmap = bmp
+        
+    def set_lbrt(self,id_val,lbrt):
+        self.lbrt[id_val]=lbrt
 
     def set_flip_LR(self, val):
         self.mirror_display = val
