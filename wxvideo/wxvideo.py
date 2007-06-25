@@ -23,6 +23,7 @@ class DynamicImageCanvas(wx.Window):
         self.mirror_display = False
         self.display_rotate_180 = False
         self.lbrt = {}
+        self.full_image_numpy = None
         
     def set_clipping(self,val):
         print 'ignoring set_clipping command in wxvideo: clipping not implemented'
@@ -42,8 +43,6 @@ class DynamicImageCanvas(wx.Window):
             linesegs = []
         if format is None:
             raise ValueError("must specify format")
-        if xoffset != 0 or yoffset != 0:
-            raise NotImplementedError("offset (%d,%d) not yet supported"%(xoffset,yoffset))
 
         rgb8 = imops.to_rgb8(format,image)
 
@@ -53,6 +52,16 @@ class DynamicImageCanvas(wx.Window):
             raise NotImplementedError("only 1 image source currently supported")
         
         h,w,three = rgb8.shape
+        # get full image
+        if self.full_image_numpy is not None:
+            full_h, full_w, tmp = self.full_image_numpy.shape
+            if h<full_h or w<full_w:
+                self.full_image_numpy[yoffset:yoffset+h,xoffset:xoffset+w,:] = rgb8
+                rgb8 = self.full_image_numpy
+                h,w = full_h, full_w
+        else:
+            self.full_image_numpy = rgb8
+            
         image = wx.EmptyImage(w,h)
         
         if 0: # now we do the whole thing
