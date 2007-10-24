@@ -10,7 +10,6 @@ setup(name='wxvideo',
       author='Andrew Straw',
       author_email='strawman@astraw.com',
       license='BSD',
-      install_requires = ['wxwrap',
-                          'imops>=0.1.dev808',
+      install_requires = ['imops>=0.1.dev808',
                           ],
       )

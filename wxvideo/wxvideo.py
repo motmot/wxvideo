@@ -1,6 +1,6 @@
 import sys, traceback
 
-from wxwrap import wx
+import wx
 import numpy
 import imops
 
