@@ -1,7 +1,6 @@
 from setuptools import setup
 
 setup(name='wxvideo',
-      version=version,
       packages = ['wxvideo'],
       version='0.5.0',
       author='Andrew Straw',
