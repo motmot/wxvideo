@@ -5,7 +5,7 @@ import numpy
 import motmot.imops.imops as imops
 
 class DynamicImageCanvas(wx.Window):
-    
+
     def __init__(self,*args,**kw):
         wx.Window.__init__(*(self,)+args, **kw)
         #w,h=10,10
@@ -16,7 +16,7 @@ class DynamicImageCanvas(wx.Window):
             drawDC.SelectObject( self.bitmap ) # draw into bmp
             drawDC.SetBrush(wx.Brush(self.GetBackgroundColour()))
             drawDC.Clear()
-        
+
         wx.EVT_PAINT(self, self._onPaint)
         self.id_val = None
         self.do_draw_points = True
@@ -24,7 +24,7 @@ class DynamicImageCanvas(wx.Window):
         self.display_rotate_180 = False
         self.lbrt = {}
         self.full_image_numpy = None
-        
+
     def set_clipping(self,val):
         print 'ignoring set_clipping command in wxvideo: clipping not implemented'
 
@@ -50,7 +50,7 @@ class DynamicImageCanvas(wx.Window):
             self.id_val = id_val
         if id_val != self.id_val:
             raise NotImplementedError("only 1 image source currently supported")
-        
+
         h,w,three = rgb8.shape
         # get full image
         if self.full_image_numpy is not None:
@@ -61,13 +61,13 @@ class DynamicImageCanvas(wx.Window):
                 h,w = full_h, full_w
         else:
             self.full_image_numpy = rgb8
-            
+
         image = wx.EmptyImage(w,h)
-        
-        if 0: # now we do the whole thing
-            # wx seems to flip data LR
-            rgb8 = rgb8[:,::-1]
-            
+
+        if 1: # now we do the whole thing
+            # wx seems to flip data UD
+            rgb8 = rgb8[::-1,:]
+
         # XXX TODO could eliminate data copy here?
         image.SetData( rgb8.tostring() )
         bmp = wx.BitmapFromImage(image)
@@ -105,18 +105,18 @@ class DynamicImageCanvas(wx.Window):
             img = img.Rotate90()
             img = img.Rotate90()
             bmp = wx.BitmapFromImage(img)
-        
+
         self.bitmap = bmp
-        
+
     def set_lbrt(self,id_val,lbrt):
         self.lbrt[id_val]=lbrt
 
     def set_flip_LR(self, val):
         self.mirror_display = val
-        
+
     def set_rotate_180(self, val):
         self.display_rotate_180 = val
-        
+
     def gui_repaint(self, drawDC=None):
         """blit bitmap to DC"""
         if drawDC is None:
@@ -124,7 +124,7 @@ class DynamicImageCanvas(wx.Window):
 
         drawDC.BeginDrawing()
         drawDC.DrawBitmap(self.bitmap, 0, 0)
-        drawDC.EndDrawing()  
+        drawDC.EndDrawing()
 
     def _onPaint(self, evt):
         """called by OS during paint event to paint screen"""
