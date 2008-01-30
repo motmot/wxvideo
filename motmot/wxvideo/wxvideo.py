@@ -64,10 +64,6 @@ class DynamicImageCanvas(wx.Window):
 
         image = wx.EmptyImage(w,h)
 
-        if 1: # now we do the whole thing
-            # wx seems to flip data UD
-            rgb8 = rgb8[::-1,:]
-
         # XXX TODO could eliminate data copy here?
         image.SetData( rgb8.tostring() )
         bmp = wx.BitmapFromImage(image)
@@ -93,18 +89,17 @@ class DynamicImageCanvas(wx.Window):
             drawDC.DrawLine(r,t, l,t)
             drawDC.DrawLine(l,t, l,b)
 
+        img = wx.ImageFromBitmap(bmp)
         if self.mirror_display:
-            img = wx.ImageFromBitmap(bmp)
+            if not self.display_rotate_180:
+                img = img.Rotate90()
+                img = img.Rotate90()
+        else:
             img = img.Mirror(True)
-            if self.display_rotate_180:
+            if not self.display_rotate_180:
                 img = img.Rotate90()
                 img = img.Rotate90()
-            bmp = wx.BitmapFromImage(img)
-        elif self.display_rotate_180:
-            img = wx.ImageFromBitmap(bmp)
-            img = img.Rotate90()
-            img = img.Rotate90()
-            bmp = wx.BitmapFromImage(img)
+        bmp = wx.BitmapFromImage(img)
 
         self.bitmap = bmp
 
