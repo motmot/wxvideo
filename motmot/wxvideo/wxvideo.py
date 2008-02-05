@@ -3,6 +3,7 @@ import sys, traceback
 import wx
 import numpy
 import motmot.imops.imops as imops
+from scipy.misc.pilutil import imresize
 
 class DynamicImageCanvas(wx.Window):
 
@@ -24,9 +25,21 @@ class DynamicImageCanvas(wx.Window):
         self.display_rotate_180 = False
         self.lbrt = {}
         self.full_image_numpy = None
+        self.doresize = False
+        self.resize = 1
 
     def set_clipping(self,val):
         print 'ignoring set_clipping command in wxvideo: clipping not implemented'
+
+    def get_resize(self):
+        return self.resize
+
+    def set_resize(self,val):
+        self.doresize = val
+
+    # so that use is the same as simple_overlay
+    def get_child_canvas(self, id_val):
+        return self
 
     def update_image_and_drawings(self,
                                   id_val,
@@ -34,8 +47,14 @@ class DynamicImageCanvas(wx.Window):
                                   format=None,
                                   points=None,
                                   linesegs=None,
+                                  point_colors=None,
+                                  point_radii=None,
+                                  lineseg_colors=None,
+                                  lineseg_widths=None,
                                   xoffset=0,
-                                  yoffset=0):
+                                  yoffset=0,
+                                  doresize=None):
+
         # create bitmap, don't paint on screen
         if points is None:
             points = []
@@ -44,7 +63,32 @@ class DynamicImageCanvas(wx.Window):
         if format is None:
             raise ValueError("must specify format")
 
+        # if doresize is not input, then use the default value
+        if doresize is None:
+            doresize = self.doresize
+
         rgb8 = imops.to_rgb8(format,image)
+
+        if doresize:
+            # how much should we resize the image
+            windowwidth = self.GetRect().GetWidth()
+            windowheight = self.GetRect().GetHeight()
+            imagewidth = rgb8.shape[1]
+            imageheight = rgb8.shape[0]
+            resizew = float(windowwidth) / float(imagewidth)
+            resizeh = float(windowheight) / float(imageheight)
+            self.resize = min(resizew,resizeh)
+            # resize the image
+            rgb8 = imresize(rgb8,self.resize)
+            # scale all the points and lines
+            pointscp = []
+            for pt in points:
+                pointscp.append([pt[0]*self.resize,pt[1]*self.resize])
+            points = pointscp
+            linesegscp = []
+            for line in linesegs:
+                linesegscp.append([line[0]*self.resize,line[1]*self.resize,line[2]*self.resize,line[3]*self.resize])
+            linesegs = linesegscp
 
         if self.id_val is None:
             self.id_val = id_val
@@ -73,16 +117,54 @@ class DynamicImageCanvas(wx.Window):
         drawDC = wx.MemoryDC()
         #assert drawDC.Ok(), "drawDC not OK"
         drawDC.SelectObject( bmp ) # draw into bmp
-        drawDC.SetPen(wx.Pen('GREEN'))
         drawDC.SetBrush(wx.Brush(wx.Colour(255,255,255), wx.TRANSPARENT))
-        point_radius=8
+
+        if self.do_draw_points and points is not None and len(points) > 0:
+            if point_radii is None:
+                point_radii = [ 8 ] * len(points)
+            if point_colors is None:
+                point_colors = [ (0,1,0) ]*len(points)
+        if self.do_draw_points and linesegs is not None and len(linesegs) > 0:
+            if lineseg_widths is None:
+                lineseg_widths = [ 1 ] * len(linesegs)
+            if lineseg_colors is None:
+                lineseg_colors = [ (0,1,0) ]*len(linesegs)
+        
+        # fixing drawing point colors!!!
         if self.do_draw_points:
-            for pt in points:
-                drawDC.DrawCircle(int(pt[0]),int(pt[1]),point_radius)
-            for lineseg in linesegs:
+            for i in range(len(points)):
+
+                # point
+                pt = points[i]
+
+                # point color
+                ptcolor = point_colors[i]
+                wxptcolor = wx.Colour(round(ptcolor[0]*255),
+                                      round(ptcolor[1]*255),
+                                      round(ptcolor[2]*255))
+                
+                # radius of point
+                ptradius = point_radii[i]
+
+                # draw it
+                drawDC.SetPen(wx.Pen(colour=wxptcolor,
+                                     width=1))
+                drawDC.DrawCircle(int(pt[0]),int(pt[1]),ptradius)
+
+            for i in range(len(linesegs)):
+                lineseg = linesegs[i]
+                linesegcolor = lineseg_colors[i]
+                wxlinesegcolor = wx.Colour(round(linesegcolor[0]*255),
+                                           round(linesegcolor[1]*255),
+                                           round(linesegcolor[2]*255))
+                linesegwidth = lineseg_widths[i]
+
+                drawDC.SetPen(wx.Pen(colour=wxlinesegcolor,
+                                     width=linesegwidth))
                 drawDC.DrawLine(*lineseg)
 
         if id_val in self.lbrt:
+            drawDC.SetPen(wx.Pen('GREEN',width=1))
             l,b,r,t = self.lbrt[id_val]
             drawDC.DrawLine(l,b, r,b)
             drawDC.DrawLine(r,b, r,t)
