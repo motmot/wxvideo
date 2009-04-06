@@ -1,4 +1,14 @@
 from setuptools import setup, find_packages
+import os
+
+kws = {}
+if not int(os.getenv( 'DISABLE_INSTALL_REQUIRES','0' )):
+    kws['install_requires'] = [
+        'numpy>=1.0.4',
+        'PIL>=1.1.6',
+        'motmot.imops',
+        'wxPython>=2.8'
+        ]
 
 setup(name='motmot.wxvideo',
       description='wx viewer of image sequences',
@@ -10,14 +20,8 @@ This is a subpackage of the motmot family of digital image utilities.
       packages = find_packages(),
       namespace_packages = ['motmot'],
       url='http://code.astraw.com/projects/motmot',
-      version='0.5.2',
+      version='0.5.3',
       author='Andrew Straw',
       author_email='strawman@astraw.com',
       license='BSD',
-      install_requires=[
-          'numpy>=1.0.4',
-          'PIL>=1.1.6',
-          'motmot.imops',
-          'wxPython>=2.8'
-          ],
-      )
+      **kws)
