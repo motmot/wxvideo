@@ -7,7 +7,6 @@ if not int(os.getenv( 'DISABLE_INSTALL_REQUIRES','0' )):
         'numpy>=1.0.4',
         'PIL>=1.1.6',
         'motmot.imops',
-        'wxPython>=2.8'
         ]
 
 setup(name='motmot.wxvideo',
