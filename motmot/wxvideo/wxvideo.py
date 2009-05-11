@@ -3,7 +3,6 @@ import sys, traceback
 import wx
 import numpy
 import motmot.imops.imops as imops
-from scipy.misc.pilutil import imresize
 
 class DynamicImageCanvas(wx.Window):
 
@@ -70,6 +69,8 @@ class DynamicImageCanvas(wx.Window):
         rgb8 = imops.to_rgb8(format,image)
 
         if doresize:
+            from scipy.misc.pilutil import imresize
+
             # how much should we resize the image
             windowwidth = self.GetRect().GetWidth()
             windowheight = self.GetRect().GetHeight()
