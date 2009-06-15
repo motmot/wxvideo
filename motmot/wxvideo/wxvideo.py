@@ -3,6 +3,7 @@ import sys, traceback
 import wx
 import numpy
 import motmot.imops.imops as imops
+import warnings
 
 class DynamicImageCanvas(wx.Window):
 
@@ -60,7 +61,8 @@ class DynamicImageCanvas(wx.Window):
         if linesegs is None:
             linesegs = []
         if format is None:
-            raise ValueError("must specify format")
+            format='MONO8'
+            warnings.warn('format unspecified - assuming MONO8')
 
         # if doresize is not input, then use the default value
         if doresize is None:
