@@ -132,7 +132,7 @@ class DynamicImageCanvas(wx.Window):
                 lineseg_widths = [ 1 ] * len(linesegs)
             if lineseg_colors is None:
                 lineseg_colors = [ (0,1,0) ]*len(linesegs)
-        
+
         # fixing drawing point colors!!!
         if self.do_draw_points:
             for i in range(len(points)):
@@ -145,7 +145,7 @@ class DynamicImageCanvas(wx.Window):
                 wxptcolor = wx.Colour(round(ptcolor[0]*255),
                                       round(ptcolor[1]*255),
                                       round(ptcolor[2]*255))
-                
+
                 # radius of point
                 ptradius = point_radii[i]
 
