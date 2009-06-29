@@ -2,6 +2,7 @@ import sys, traceback
 
 import wx
 import numpy
+import numpy as np
 import motmot.imops.imops as imops
 import warnings
 
@@ -190,6 +191,14 @@ class DynamicImageCanvas(wx.Window):
 
     def set_lbrt(self,id_val,lbrt):
         self.lbrt[id_val]=lbrt
+
+    def get_canvas_copy(self):
+        wx_im = wx.ImageFromBitmap(self.bitmap)
+        buf = wx_im.GetData()
+        np_im = np.frombuffer(buf,dtype=np.uint8)
+        w,h=wx_im.GetWidth(),wx_im.GetHeight()
+        np_im.shape = (h,w,3)
+        return np_im
 
     def set_flip_LR(self, val):
         self.mirror_display = val
