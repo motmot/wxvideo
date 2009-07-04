@@ -7,6 +7,16 @@ import motmot.imops.imops as imops
 import warnings
 
 class DynamicImageCanvas(wx.Window):
+    """Display uncompressed video images
+
+    This class supports the display of multiple, side-by-side
+    images. Each of these images is from a single source (a camera,
+    for example), so multiple views can be displayed with one
+    :class:`DynamicImageCanvas` instance. Each source has an identity
+    string *id_val* which is used when updating that view's image.
+
+    Simple overlay drawings are also possible. Points and lines may be
+    drawn on top of the displayed images."""
 
     def __init__(self,*args,**kw):
         wx.Window.__init__(*(self,)+args, **kw)
@@ -55,6 +65,24 @@ class DynamicImageCanvas(wx.Window):
                                   xoffset=0,
                                   yoffset=0,
                                   doresize=None):
+        """update the displayed image
+
+        **Arguments**
+
+        id_val : string
+            An identifier for the particular source being updated
+        image : numpy array
+            The image data to update
+
+        **Optional keyword arguments**
+
+        format : string
+            The image format (e.g. 'MONO8', 'RGB8', or 'YUV422')
+        points : list of points
+            Points to display (e.g. [(x0,y0),(x1,y1)])
+        linesegs : list of line segments
+            Line segments to display (e.g. [(x0,y0,x1,y1),(x1,y1,x2,y2)])
+        """
 
         # create bitmap, don't paint on screen
         if points is None:
@@ -193,6 +221,7 @@ class DynamicImageCanvas(wx.Window):
         self.lbrt[id_val]=lbrt
 
     def get_canvas_copy(self):
+        """get a copy of the current image as an RGB8 numpy array"""
         wx_im = wx.ImageFromBitmap(self.bitmap)
         buf = wx_im.GetData()
         np_im = np.frombuffer(buf,dtype=np.uint8)
@@ -201,13 +230,32 @@ class DynamicImageCanvas(wx.Window):
         return np_im
 
     def set_flip_LR(self, val):
+        """update the view transformation to include a left-right image flip for all images
+
+        **Arguments**
+        val : boolean
+            Whether to flip the image
+        """
         self.mirror_display = val
 
     def set_rotate_180(self, val):
+        """update the view transformation to include a 180 degree rotation for all images
+
+        **Arguments**
+
+        val : boolean
+            Whether to rotate the image
+        """
         self.display_rotate_180 = val
 
     def gui_repaint(self, drawDC=None):
-        """blit bitmap to DC"""
+        """blit bitmap to drawing context
+
+        **Optional keyword Arguments**
+
+        drawDC : wx.PaintDC instance
+            The draw context into which to blit
+        """
         if drawDC is None:
             drawDC=wx.ClientDC(self)
 
