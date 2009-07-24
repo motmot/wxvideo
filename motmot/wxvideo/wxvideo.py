@@ -193,7 +193,12 @@ class DynamicImageCanvas(wx.Window):
 
                 drawDC.SetPen(wx.Pen(colour=wxlinesegcolor,
                                      width=linesegwidth))
-                drawDC.DrawLine(*lineseg)
+                if len(lineseg)<=4:
+                    drawDC.DrawLine(*lineseg)
+                else:
+                    for start_idx in range(0, len(lineseg)-3, 2):
+                        this_seg = lineseg[start_idx:start_idx+4]
+                        drawDC.DrawLine(*this_seg)
 
         if id_val in self.lbrt:
             drawDC.SetPen(wx.Pen('GREEN',width=1))
