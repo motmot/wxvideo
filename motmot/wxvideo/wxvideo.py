@@ -158,7 +158,7 @@ class DynamicImageCanvas(wx.Window):
                 point_colors = [ (0,1,0) ]*len(points)
         if self.do_draw_points and linesegs is not None and len(linesegs) > 0:
             if lineseg_widths is None:
-                lineseg_widths = [ 1 ] * len(linesegs)
+                lineseg_widths = [ 5 ] * len(linesegs)
             if lineseg_colors is None:
                 lineseg_colors = [ (0,1,0) ]*len(linesegs)
 
