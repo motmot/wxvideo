@@ -13,7 +13,7 @@ This is a subpackage of the motmot family of digital image utilities.
       packages = find_packages(),
       namespace_packages = ['motmot'],
       url='http://code.astraw.com/projects/motmot',
-      version='0.5.5',
+      version='0.5.6',
       author='Andrew Straw',
       author_email='strawman@astraw.com',
       license='BSD',
